@@ -1,0 +1,19 @@
+name: SuperPlumberBros
+options:
+  bundleIdPrefix: com.wallus
+targets:
+  SuperPlumberBros:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: SuperPlumberBros
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.wallus.superplumberbros
+        INFOPLIST_FILE: SuperPlumberBros/Info.plist
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_VERSION: "5.0"
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGNING_ALLOWED: NO
