@@ -654,6 +654,7 @@ final class GameScene: SKScene {
         // Reset player + camera; enemies/items stay (classic keeps level state).
         player.removeFromParent()
         spawnPlayer()
+        player.invincibleUntil = lastUpdate + 2.0
         state = .playing
         camMinX = size.width / 2
         cameraNode.position.x = camMinX

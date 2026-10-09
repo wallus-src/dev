@@ -15,7 +15,7 @@ sound effects — no copyrighted assets.
   shell, kick it, sliding shells clear out other enemies).
 - **Power-ups** — mushrooms make you big (two tiles tall, can smash bricks,
   shrinks instead of dying on a hit). 100 coins = extra life.
-- **HUD & flow** — score / coins / world / timer, title screen, pause,
+- **HUD & flow** — score / coins / world / timer, title screen,
   game-over & course-clear screens, score tally for remaining time.
 - **Touch controls** — ◀ ▶ move, **A** jump, **B** run (safe-area aware).
 - **Keyboard controls** (iPad / simulator) — arrows move, `Z`/`Space` jump,
