@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import { link } from '../utils/posts';
+---
+
+<Base title="About" description="What Fieldnotes is, and how it's made.">
+	<div class="shell">
+		<header class="page-head">
+			<span class="mono-label">About</span>
+			<h1>A notebook,<br />kept in public.</h1>
+		</header>
+
+		<div class="measure" style="padding-bottom:2rem">
+			<div class="prose">
+				<p>
+					Fieldnotes is a personal publication about the craft of building software.
+					It favors long essays over hot takes, revision over velocity, and the kind
+					of writing you can return to a year later and still find useful.
+				</p>
+				<p>
+					The premise is simple: the interesting parts of engineering happen in the
+					margins — the naming decisions, the deleted code, the README nobody read.
+					This site exists to write those margins down.
+				</p>
+			</div>
+		</div>
+
+		<div class="colophon" style="border-top:1px solid var(--line)">
+			<div>
+				<h2>Colophon</h2>
+				<p>Set in Fraunces and Inter, with JetBrains Mono for the apparatus. Built with Astro, deployed as static files. No trackers, no comments, no feed algorithm.</p>
+			</div>
+			<div>
+				<h2>Elsewhere</h2>
+				<p>Subscribe via <a href={link('/rss.xml')}>RSS</a>. Source code lives on <a href="https://github.com/wallus-src/dev">GitHub</a>. Correspondence welcome by reply-post — the old-fashioned way.</p>
+			</div>
+			<div>
+				<h2>Principles</h2>
+				<p>Publish rarely. Revise often. Own the URL. Fast pages are a feature. Everything here is a draft that shipped.</p>
+			</div>
+		</div>
+	</div>
+</Base>

@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { link } from '../utils/posts';
+---
+
+<Base title="Page not found" description="This page doesn't exist.">
+	<div class="shell">
+		<header class="page-head" style="text-align:center;padding-block:clamp(5rem,14vw,9rem)">
+			<span class="mono-label">Error 404</span>
+			<h1>This page is still<br />being written.</h1>
+			<p class="dek" style="margin-inline:auto">Whatever brought you here — a stale link, a typo, a draft that never shipped — the archive is intact.</p>
+			<p style="margin-top:2rem"><a class="tag" href={link('/')} style="font-size:0.8125rem;padding:0.5rem 1.1rem">← Back to the index</a></p>
+		</header>
+	</div>
+</Base>

@@ -1,0 +1,41 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostRow from '../../components/PostRow.astro';
+import { getPosts, getAllTags, link } from '../../utils/posts';
+
+const posts = await getPosts();
+const tags = getAllTags(posts);
+const byYear = new Map<number, typeof posts>();
+for (const post of posts) {
+	const year = post.data.pubDate.getUTCFullYear();
+	if (!byYear.has(year)) byYear.set(year, []);
+	byYear.get(year)!.push(post);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<Base title="Writing" description="Every essay published on Fieldnotes.">
+	<div class="shell">
+		<header class="page-head">
+			<h1>The archive</h1>
+			<p class="dek">{posts.length} essays, newest first. Press <kbd style="font-family:var(--font-mono);font-size:0.8em;border:1px solid var(--line);border-radius:0.3rem;padding:0.1em 0.45em;">⌘K</kbd> to search.</p>
+		</header>
+
+		<div class="archive-toolbar">
+			<ul class="tag-list">
+				{tags.map(([tag, count]) => (
+					<li><a class="tag" href={link(`/tags/${tag}/`)}>{tag} <span style="color:var(--ink-3)">{count}</span></a></li>
+				))}
+			</ul>
+		</div>
+
+		{years.map((year) => (
+			<section>
+				<div class="year-marker">{year}</div>
+				<ul class="index-list">
+					{byYear.get(year)!.map((post) => <li><PostRow post={post} /></li>)}
+				</ul>
+			</section>
+		))}
+	</div>
+</Base>

@@ -1,0 +1,25 @@
+---
+import type { Post } from '../utils/posts';
+import { formatDate, link, readingTime } from '../utils/posts';
+
+interface Props {
+	post: Post;
+}
+
+const { post } = Astro.props;
+const minutes = readingTime(post.body);
+---
+
+<a class="post-row" href={link(`/blog/${post.id}/`)}>
+	<span class="date">{formatDate(post.data.pubDate)}</span>
+	<span class="row-main">
+		<h3>{post.data.title}</h3>
+		<span class="lede">{post.data.description}</span>
+	</span>
+	<span class="row-side">
+		<span class="mono-label">{minutes} min</span>
+		{post.data.tags.length > 0 && (
+			<span class="mono-label">{post.data.tags.slice(0, 2).join(' · ')}</span>
+		)}
+	</span>
+</a>

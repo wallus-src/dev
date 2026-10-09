@@ -1,0 +1,75 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PostRow from '../components/PostRow.astro';
+import { SITE_DESCRIPTION, SITE_TAGLINE, SITE_TITLE } from '../consts';
+import { getPosts, getAllTags, link, readingTime } from '../utils/posts';
+import FormattedDate from '../components/FormattedDate.astro';
+
+const posts = await getPosts();
+const featured = posts.find((p) => p.data.featured) ?? posts[0];
+const rest = posts.filter((p) => p.id !== featured?.id).slice(0, 6);
+const tags = getAllTags(posts).slice(0, 10);
+const today = new Date();
+---
+
+<Base title={SITE_TITLE} description={SITE_DESCRIPTION}>
+	<section class="masthead shell">
+		<div class="dateline">
+			<span class="mono-label">A journal of the craft</span>
+			<span class="mono-label"><FormattedDate date={today} /></span>
+		</div>
+		<h1>Field<br />notes<span class="accent">*</span></h1>
+		<p class="dek">{SITE_TAGLINE} Essays on building software carefully — written slowly, published when ready.</p>
+	</section>
+
+	{featured && (
+		<div class="shell">
+			<div class="section-head">
+				<span class="mono-label">Featured essay</span>
+			</div>
+			<a class="featured" href={link(`/blog/${featured.id}/`)}>
+				<div class="standfirst">
+					<div class="post-meta">
+						<FormattedDate date={featured.data.pubDate} />
+						<span class="dot">{readingTime(featured.body)} min read</span>
+					</div>
+					<h2>{featured.data.title}</h2>
+					<p>{featured.data.description}</p>
+					<ul class="tag-list">
+						{featured.data.tags.map((tag) => <li><span class="tag">{tag}</span></li>)}
+					</ul>
+				</div>
+				{featured.data.heroImage && (
+					<div class="cover">
+						<Image src={featured.data.heroImage} alt={featured.data.heroAlt} widths={[560, 900]} sizes="(max-width: 48rem) 100vw, 45rem" />
+					</div>
+				)}
+			</a>
+		</div>
+	)}
+
+	<div class="shell">
+		<div class="section-head">
+			<span class="mono-label">The index</span>
+			<a href={link('/blog')}>Browse the archive →</a>
+		</div>
+		<ul class="index-list">
+			{rest.map((post) => <li><PostRow post={post} /></li>)}
+		</ul>
+	</div>
+
+	{tags.length > 0 && (
+		<div class="shell">
+			<div class="section-head">
+				<span class="mono-label">Topics</span>
+				<a href={link('/tags')}>All topics →</a>
+			</div>
+			<ul class="tag-list">
+				{tags.map(([tag, count]) => (
+					<li><a class="tag" href={link(`/tags/${tag}/`)}>{tag} <span style="color:var(--ink-3)">{count}</span></a></li>
+				))}
+			</ul>
+		</div>
+	)}
+</Base>

@@ -1,0 +1,18 @@
+# Devin environment blueprint for Fieldnotes (Astro 7 blog).
+# Node/npm are already on the image.
+runs-on: macos
+maintenance: |
+  npm install
+knowledge:
+  - name: dev
+    contents: |
+      npx astro dev --background (stop: npx astro dev stop, logs: npx astro dev logs) — site serves under http://localhost:4321/dev/ (root 404s is expected; base is SITE_URL/BASE_PATH env-driven)
+  - name: build
+    contents: |
+      npm run build
+  - name: check
+    contents: |
+      npx astro check
+  - name: notes
+    contents: |
+      Posts live in src/content/blog/ as .md/.mdx with typed frontmatter (title, description, pubDate, tags, featured, draft, heroImage, heroAlt). Search index is generated at /search.json; the theme init script needs data-astro-rerun to survive view-transition swaps.

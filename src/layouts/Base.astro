@@ -1,0 +1,29 @@
+---
+import type { ImageMetadata } from 'astro';
+import { ClientRouter } from 'astro:transitions';
+import BaseHead from '../components/BaseHead.astro';
+import SearchPalette from '../components/SearchPalette.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+
+interface Props {
+	title: string;
+	description: string;
+	image?: ImageMetadata;
+}
+
+const { title, description, image } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} image={image} />
+		<ClientRouter />
+	</head>
+	<body>
+		<SiteHeader />
+		<slot />
+		<SiteFooter />
+		<SearchPalette />
+	</body>
+</html>
