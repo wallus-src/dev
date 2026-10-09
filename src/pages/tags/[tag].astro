@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostRow from '../../components/PostRow.astro';
+import { getPosts, getAllTags } from '../../utils/posts';
+
+export async function getStaticPaths() {
+	const posts = await getPosts();
+	return getAllTags(posts).map(([tag]) => ({
+		params: { tag },
+		props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)) },
+	}));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<Base title={`Topic: ${tag}`} description={`Essays filed under ${tag}.`}>
+	<div class="shell">
+		<header class="page-head">
+			<span class="mono-label">Topic</span>
+			<h1>{tag}</h1>
+			<p class="dek">{posts.length} {posts.length === 1 ? 'essay' : 'essays'} on {tag}. <a href="/tags">All topics →</a></p>
+		</header>
+		<ul class="index-list">
+			{posts.map((post) => <li><PostRow post={post} /></li>)}
+		</ul>
+	</div>
+</Base>

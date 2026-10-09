@@ -1,0 +1,120 @@
+---
+import { Image } from 'astro:assets';
+import type { MarkdownHeading } from 'astro';
+import Base from './Base.astro';
+import type { Post } from '../utils/posts';
+import { nextPrev, readingTime } from '../utils/posts';
+import FormattedDate from '../components/FormattedDate.astro';
+
+interface Props {
+	post: Post;
+	posts: Post[];
+	headings: MarkdownHeading[];
+}
+
+const { post, posts, headings } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, heroImage, heroAlt } = post.data;
+const minutes = readingTime(post.body);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const { prev, next } = nextPrev(posts, post);
+---
+
+<Base title={title} description={description} image={heroImage}>
+	<div class="reading-progress" data-progress></div>
+	<article class="article-shell">
+		<header class="article-head shell">
+			<div class="eyebrow">
+				<ul class="tag-list" style="justify-content:center">
+					{tags.map((tag) => <li><a class="tag" href={`/tags/${tag}/`}>{tag}</a></li>)}
+				</ul>
+			</div>
+			<h1>{title}</h1>
+			<p class="dek">{description}</p>
+			<div class="post-meta">
+				<FormattedDate date={pubDate} />
+				{updatedDate && <span class="dot">Updated <FormattedDate date={updatedDate} /></span>}
+				<span class="dot">{minutes} min read</span>
+			</div>
+			<hr class="rule" />
+		</header>
+
+		{heroImage && (
+			<figure class="hero-figure shell">
+				<Image src={heroImage} alt={heroAlt} widths={[720, 1200]} sizes="(max-width: 62rem) 100vw, 62rem" />
+				{heroAlt && <figcaption>{heroAlt}</figcaption>}
+			</figure>
+		)}
+
+		<div class="article-grid shell">
+			<div class="prose">
+				<slot />
+			</div>
+			{toc.length > 1 && (
+				<aside class="article-aside">
+					<nav class="toc" aria-label="Table of contents">
+						<div class="mono-label toc-title">Contents</div>
+						<ol>
+							{toc.map((h) => (
+								<li>
+									<a href={`#${h.slug}`} class={h.depth === 3 ? 'depth-3' : ''} data-toc-link={h.slug}>{h.text}</a>
+								</li>
+							))}
+						</ol>
+					</nav>
+				</aside>
+			)}
+		</div>
+	</article>
+
+	<nav class="post-nav" aria-label="More writing">
+		{prev ? (
+			<a href={`/blog/${prev.id}/`} class="prev">
+				<span class="direction">← Older</span>
+				<span class="title">{prev.data.title}</span>
+			</a>
+		) : <a href="/blog" class="prev"><span class="direction">← Archive</span><span class="title">All writing</span></a>}
+		{next ? (
+			<a href={`/blog/${next.id}/`} class="next">
+				<span class="direction">Newer →</span>
+				<span class="title">{next.data.title}</span>
+			</a>
+		) : <a href="/blog" class="next"><span class="direction">Archive →</span><span class="title">All writing</span></a>}
+	</nav>
+
+	<script>
+		function initArticle() {
+			const bar = document.querySelector<HTMLElement>('[data-progress]');
+			const article = document.querySelector('article');
+			if (!bar || !article) return;
+
+			const onScroll = () => {
+				const rect = article.getBoundingClientRect();
+				const total = rect.height - window.innerHeight;
+				const done = Math.min(Math.max(-rect.top / Math.max(total, 1), 0), 1);
+				bar.style.width = `${done * 100}%`;
+
+				const heads = article.querySelectorAll<HTMLElement>('.prose h2[id], .prose h3[id]');
+				let current: string | null = null;
+				heads.forEach((h) => {
+					if (h.getBoundingClientRect().top < 140) current = h.id;
+				});
+				document.querySelectorAll('[data-toc-link]').forEach((a) => {
+					a.classList.toggle('active', (a as HTMLElement).dataset.tocLink === current);
+				});
+			};
+			const win = window as unknown as { __articleScroll?: () => void };
+			if (win.__articleScroll) window.removeEventListener('scroll', win.__articleScroll);
+			win.__articleScroll = onScroll;
+			window.addEventListener('scroll', onScroll, { passive: true });
+			onScroll();
+		}
+		initArticle();
+		document.addEventListener('astro:after-swap', initArticle);
+		document.addEventListener('astro:page-load', () => {
+			if (!document.querySelector('article')) {
+				const bar = document.querySelector<HTMLElement>('[data-progress]');
+				if (bar) bar.style.width = '0';
+			}
+		});
+	</script>
+</Base>

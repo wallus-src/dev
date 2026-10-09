@@ -1,0 +1,21 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPosts, getAllTags } from '../../utils/posts';
+
+const posts = await getPosts();
+const tags = getAllTags(posts);
+---
+
+<Base title="Topics" description="Browse essays by topic.">
+	<div class="shell">
+		<header class="page-head">
+			<h1>Topics</h1>
+			<p class="dek">Every essay, filed under {tags.length} topics.</p>
+		</header>
+		<ul class="tag-list" style="padding-bottom:3rem">
+			{tags.map(([tag, count]) => (
+				<li><a class="tag" href={`/tags/${tag}/`} style="font-size:0.8125rem;padding:0.4rem 0.9rem">{tag} <span style="color:var(--ink-3)">{count}</span></a></li>
+			))}
+		</ul>
+	</div>
+</Base>

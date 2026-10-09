@@ -1,0 +1,129 @@
+<div class="search-overlay" data-search-overlay role="dialog" aria-modal="true" aria-label="Search">
+	<div class="search-panel">
+		<div class="search-input-row">
+			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<circle cx="11" cy="11" r="7" />
+				<path d="m20 20-3.5-3.5" />
+			</svg>
+			<input
+				type="search"
+				class="search-input"
+				placeholder="Search essays…"
+				aria-label="Search posts"
+				data-search-input
+				autocomplete="off"
+				spellcheck="false"
+			/>
+			<span class="search-hint">esc</span>
+		</div>
+		<div class="search-results" data-search-results role="listbox"></div>
+	</div>
+</div>
+
+<script>
+	type SearchItem = { slug: string; title: string; description: string; tags: string[]; date: string };
+
+	let index: SearchItem[] | null = null;
+	let selected = 0;
+	let results: SearchItem[] = [];
+
+	const overlay = () => document.querySelector<HTMLElement>('[data-search-overlay]');
+	const input = () => document.querySelector<HTMLInputElement>('[data-search-input]');
+	const list = () => document.querySelector<HTMLElement>('[data-search-results]');
+	const isOpen = () => overlay()?.classList.contains('open') ?? false;
+
+	async function loadIndex() {
+		if (index) return;
+		const res = await fetch('/search.json');
+		index = (await res.json()) as SearchItem[];
+	}
+
+	function score(item: SearchItem, query: string): number {
+		const q = query.toLowerCase();
+		const title = item.title.toLowerCase();
+		const tags = item.tags.join(' ').toLowerCase();
+		const desc = item.description.toLowerCase();
+		if (title.includes(q)) return 3;
+		if (tags.includes(q)) return 2;
+		if (desc.includes(q)) return 1;
+		return q.split(/\s+/).every((w) => (title + ' ' + tags + ' ' + desc).includes(w)) ? 0.5 : 0;
+	}
+
+	function render() {
+		const el = list();
+		if (!el) return;
+		if (!index || index.length === 0 || (input()?.value.trim() && results.length === 0)) {
+			el.innerHTML = `<div class="search-empty">Nothing found — try another word.</div>`;
+			return;
+		}
+		const items = input()?.value.trim() ? results : index.slice(0, 8);
+		el.innerHTML = items
+			.map(
+				(item, i) => `
+				<a class="search-result ${i === selected ? 'selected' : ''}" href="/blog/${item.slug}/" role="option" data-idx="${i}">
+					<span class="r-title">${item.title}</span>
+					<span class="r-date">${item.date}</span>
+				</a>`
+			)
+			.join('');
+	}
+
+	function run() {
+		const q = input()?.value.trim() ?? '';
+		results = !index ? [] : index
+			.map((item) => ({ item, s: score(item, q) }))
+			.filter((r) => r.s > 0)
+			.sort((a, b) => b.s - a.s)
+			.map((r) => r.item);
+		selected = 0;
+		render();
+	}
+
+	function openSearch() {
+		overlay()?.classList.add('open');
+		document.body.style.overflow = 'hidden';
+		loadIndex().then(() => {
+			render();
+			input()?.focus();
+		});
+	}
+
+	function closeSearch() {
+		overlay()?.classList.remove('open');
+		document.body.style.overflow = '';
+		const el = input();
+		if (el) el.value = '';
+	}
+
+	document.addEventListener('click', (e) => {
+		const target = e.target as HTMLElement;
+		if (target.closest('[data-open-search]')) openSearch();
+		else if (target === overlay()) closeSearch();
+	});
+
+	document.addEventListener('input', (e) => {
+		if ((e.target as HTMLElement).matches('[data-search-input]')) run();
+	});
+
+	document.addEventListener('keydown', (e) => {
+		if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+			e.preventDefault();
+			isOpen() ? closeSearch() : openSearch();
+			return;
+		}
+		if (!isOpen()) return;
+		if (e.key === 'Escape') closeSearch();
+		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+			e.preventDefault();
+			const count = list()?.querySelectorAll('.search-result').length ?? 0;
+			if (count === 0) return;
+			selected = (selected + (e.key === 'ArrowDown' ? 1 : -1) + count) % count;
+			render();
+			list()?.querySelector('.selected')?.scrollIntoView({ block: 'nearest' });
+		}
+		if (e.key === 'Enter') {
+			const el = list()?.querySelector<HTMLAnchorElement>('.search-result.selected');
+			if (el) window.location.href = el.href;
+		}
+	});
+</script>
