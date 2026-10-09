@@ -35,7 +35,7 @@ class Entity: SKSpriteNode {
             let col = world!.col(atX: right)
             let (r0, r1) = rowSpan()
             for r in r0 ... r1 where world!.isSolid(col: col, row: r) {
-                position.x = world!.tileLeft(col) - size.width / 2 - size.width * insetX
+                position.x = world!.tileLeft(col) - size.width / 2 + size.width * insetX
                 vel.x = 0
                 hitWall()
                 break
@@ -44,7 +44,7 @@ class Entity: SKSpriteNode {
             let col = world!.col(atX: left)
             let (r0, r1) = rowSpan()
             for r in r0 ... r1 where world!.isSolid(col: col, row: r) {
-                position.x = world!.tileRight(col) + size.width / 2 + size.width * insetX
+                position.x = world!.tileRight(col) + size.width / 2 - size.width * insetX
                 vel.x = 0
                 hitWall()
                 break
@@ -178,7 +178,7 @@ final class Player: Entity {
         if inputDir != 0 {
             if vel.x != 0 && (vel.x > 0) != (inputDir > 0) {
                 vel.x += inputDir * Self.skidDecel * dt
-                if (vel.x > 0) != (inputDir > 0) { vel.x = inputDir * 20 }
+                if (vel.x > 0) == (inputDir > 0) { vel.x = inputDir * 20 }
             } else {
                 vel.x += inputDir * accel * dt
             }
@@ -247,6 +247,8 @@ class Walker: Entity {
     var moveSpeed: CGFloat = 55
     var alive = true
     var squashTimer: TimeInterval = 0
+    /// Brief window after being kicked during which the shell can't hit the kicker.
+    var contactGraceUntil: TimeInterval = 0
 
     override func hitWall() { dir = -dir }
 

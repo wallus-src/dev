@@ -30,6 +30,7 @@ final class GameScene: SKScene {
     private var scenery: [(node: SKNode, wx: CGFloat, factor: CGFloat)] = []
     private var flagNode: SKSpriteNode!
     private var poleX: CGFloat = 0
+    private var poleTopY: CGFloat = 0
     private var flagSequenceT: TimeInterval = 0
 
     // MARK: Entities
@@ -224,7 +225,8 @@ final class GameScene: SKScene {
         worldNode.addChild(pole)
 
         let ball = Art.texFlagBall.spriteNode(pixelHeight: tileSize * 0.55)
-        ball.position = CGPoint(x: poleX, y: tileTop(13) + poleHeight + tileSize * 0.2)
+        poleTopY = tileTop(13) + poleHeight
+        ball.position = CGPoint(x: poleX, y: poleTopY + tileSize * 0.2)
         ball.zPosition = 4
         worldNode.addChild(ball)
 
@@ -365,9 +367,9 @@ final class GameScene: SKScene {
             let newRole = role(at: p)
             let oldRole = touchRoles[id]
             if newRole != oldRole {
-                if let o = oldRole { applyRole(o, down: false) }
-                if let n = newRole { applyRole(n, down: true) }
                 touchRoles[id] = newRole
+                if let o = oldRole, !touchRoles.values.contains(o) { applyRole(o, down: false) }
+                if let n = newRole { applyRole(n, down: true) }
             }
         }
     }
@@ -382,10 +384,10 @@ final class GameScene: SKScene {
 
     private func releaseTouch(_ t: UITouch) {
         let id = ObjectIdentifier(t)
-        if let r = touchRoles[id] {
-            applyRole(r, down: false)
-            touchRoles.removeValue(forKey: id)
-        }
+        guard let r = touchRoles[id] else { return }
+        touchRoles.removeValue(forKey: id)
+        // Another finger may still hold the same control.
+        if !touchRoles.values.contains(r) { applyRole(r, down: false) }
     }
 
     private func applyRole(_ role: String, down: Bool) {
@@ -826,10 +828,13 @@ final class GameScene: SKScene {
                         if player.dead { killPlayer() }
                     }
                 case .shell:
-                    // Touching a still shell kicks it away.
+                    // Touching a still shell kicks it away; the brief grace
+                    // keeps it from hurting the kicker on the next tick.
                     k.kick(fromRight: player.position.x > w.position.x)
+                    k.contactGraceUntil = now + 0.15
                     score += 100
                 case .sliding:
+                    if now < w.contactGraceUntil { break }
                     if stomping {
                         k.stomp()
                         bounce()
@@ -902,7 +907,8 @@ final class GameScene: SKScene {
 
     private func checkFlagpole() {
         guard state == .playing else { return }
-        if player.right >= poleX - 2 {
+        // Must overlap the pole itself, not sail over its top.
+        if player.right >= poleX - 2, player.bottom < poleTopY {
             startFlagSequence()
         }
     }
