@@ -6,7 +6,7 @@ maintenance: |
 knowledge:
   - name: dev
     contents: |
-      npx astro dev --background (stop: npx astro dev stop, logs: npx astro dev logs) — port 4321
+      npx astro dev --background (stop: npx astro dev stop, logs: npx astro dev logs) — site serves under http://localhost:4321/dev/ (root 404s is expected; base is SITE_URL/BASE_PATH env-driven)
   - name: build
     contents: |
       npm run build

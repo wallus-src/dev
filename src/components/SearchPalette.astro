@@ -11,6 +11,7 @@
 				placeholder="Search essays…"
 				aria-label="Search posts"
 				data-search-input
+				name="search"
 				autocomplete="off"
 				spellcheck="false"
 			/>
@@ -21,6 +22,7 @@
 </div>
 
 <script>
+	import { navigate } from 'astro:transitions/client';
 	type SearchItem = { slug: string; title: string; description: string; tags: string[]; date: string };
 
 	let index: SearchItem[] | null = null;
@@ -134,7 +136,10 @@
 		}
 		if (e.key === 'Enter') {
 			const el = list()?.querySelector<HTMLAnchorElement>('.search-result.selected');
-			if (el) window.location.href = el.href;
+			if (el) {
+				closeSearch();
+				navigate(el.href);
+			}
 		}
 	});
 </script>
