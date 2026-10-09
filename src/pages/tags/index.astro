@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getPosts, getAllTags } from '../../utils/posts';
+import { getPosts, getAllTags, link } from '../../utils/posts';
 
 const posts = await getPosts();
 const tags = getAllTags(posts);
@@ -14,7 +14,7 @@ const tags = getAllTags(posts);
 		</header>
 		<ul class="tag-list" style="padding-bottom:3rem">
 			{tags.map(([tag, count]) => (
-				<li><a class="tag" href={`/tags/${tag}/`} style="font-size:0.8125rem;padding:0.4rem 0.9rem">{tag} <span style="color:var(--ink-3)">{count}</span></a></li>
+				<li><a class="tag" href={link(`/tags/${tag}/`)} style="font-size:0.8125rem;padding:0.4rem 0.9rem">{tag} <span style="color:var(--ink-3)">{count}</span></a></li>
 			))}
 		</ul>
 	</div>

@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import PostRow from '../components/PostRow.astro';
 import { SITE_DESCRIPTION, SITE_TAGLINE, SITE_TITLE } from '../consts';
-import { getPosts, getAllTags, readingTime } from '../utils/posts';
+import { getPosts, getAllTags, link, readingTime } from '../utils/posts';
 import FormattedDate from '../components/FormattedDate.astro';
 
 const posts = await getPosts();
@@ -28,7 +28,7 @@ const today = new Date();
 			<div class="section-head">
 				<span class="mono-label">Featured essay</span>
 			</div>
-			<a class="featured" href={`/blog/${featured.id}/`}>
+			<a class="featured" href={link(`/blog/${featured.id}/`)}>
 				<div class="standfirst">
 					<div class="post-meta">
 						<FormattedDate date={featured.data.pubDate} />
@@ -52,7 +52,7 @@ const today = new Date();
 	<div class="shell">
 		<div class="section-head">
 			<span class="mono-label">The index</span>
-			<a href="/blog">Browse the archive →</a>
+			<a href={link('/blog')}>Browse the archive →</a>
 		</div>
 		<ul class="index-list">
 			{rest.map((post) => <li><PostRow post={post} /></li>)}
@@ -63,11 +63,11 @@ const today = new Date();
 		<div class="shell">
 			<div class="section-head">
 				<span class="mono-label">Topics</span>
-				<a href="/tags">All topics →</a>
+				<a href={link('/tags')}>All topics →</a>
 			</div>
 			<ul class="tag-list">
 				{tags.map(([tag, count]) => (
-					<li><a class="tag" href={`/tags/${tag}/`}>{tag} <span style="color:var(--ink-3)">{count}</span></a></li>
+					<li><a class="tag" href={link(`/tags/${tag}/`)}>{tag} <span style="color:var(--ink-3)">{count}</span></a></li>
 				))}
 			</ul>
 		</div>

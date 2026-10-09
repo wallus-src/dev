@@ -22,6 +22,16 @@ Your essay…
 
 Set `featured: true` on at most one post to pin it on the home page, and `draft: true` to hide a post everywhere.
 
+## Deploying
+
+The site builds into `./dist/` as static files. Set the public origin at build time so canonical URLs, the sitemap, and RSS links are correct:
+
+```sh
+SITE_URL=https://your-domain.example BASE_PATH=/ npm run build
+```
+
+Without overrides it targets GitHub Pages at `https://wallus-src.github.io/dev/`. All internal links are base-aware via `link()` in `src/utils/posts.ts`.
+
 ## Commands
 
 | Command           | Action                                          |

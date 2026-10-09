@@ -1,13 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PostRow from '../../components/PostRow.astro';
-import { getPosts, getAllTags } from '../../utils/posts';
+import { getPosts, getAllTags, link } from '../../utils/posts';
 
 const posts = await getPosts();
 const tags = getAllTags(posts);
 const byYear = new Map<number, typeof posts>();
 for (const post of posts) {
-	const year = post.data.pubDate.getFullYear();
+	const year = post.data.pubDate.getUTCFullYear();
 	if (!byYear.has(year)) byYear.set(year, []);
 	byYear.get(year)!.push(post);
 }
@@ -24,7 +24,7 @@ const years = [...byYear.keys()].sort((a, b) => b - a);
 		<div class="archive-toolbar">
 			<ul class="tag-list">
 				{tags.map(([tag, count]) => (
-					<li><a class="tag" href={`/tags/${tag}/`}>{tag} <span style="color:var(--ink-3)">{count}</span></a></li>
+					<li><a class="tag" href={link(`/tags/${tag}/`)}>{tag} <span style="color:var(--ink-3)">{count}</span></a></li>
 				))}
 			</ul>
 		</div>

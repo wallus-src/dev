@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import type { MarkdownHeading } from 'astro';
 import Base from './Base.astro';
 import type { Post } from '../utils/posts';
-import { nextPrev, readingTime } from '../utils/posts';
+import { link, nextPrev, readingTime } from '../utils/posts';
 import FormattedDate from '../components/FormattedDate.astro';
 
 interface Props {
@@ -25,7 +25,7 @@ const { prev, next } = nextPrev(posts, post);
 		<header class="article-head shell">
 			<div class="eyebrow">
 				<ul class="tag-list" style="justify-content:center">
-					{tags.map((tag) => <li><a class="tag" href={`/tags/${tag}/`}>{tag}</a></li>)}
+					{tags.map((tag) => <li><a class="tag" href={link(`/tags/${tag}/`)}>{tag}</a></li>)}
 				</ul>
 			</div>
 			<h1>{title}</h1>
@@ -68,17 +68,17 @@ const { prev, next } = nextPrev(posts, post);
 
 	<nav class="post-nav" aria-label="More writing">
 		{prev ? (
-			<a href={`/blog/${prev.id}/`} class="prev">
+			<a href={link(`/blog/${prev.id}/`)} class="prev">
 				<span class="direction">← Older</span>
 				<span class="title">{prev.data.title}</span>
 			</a>
-		) : <a href="/blog" class="prev"><span class="direction">← Archive</span><span class="title">All writing</span></a>}
+		) : <a href={link('/blog')} class="prev"><span class="direction">← Archive</span><span class="title">All writing</span></a>}
 		{next ? (
-			<a href={`/blog/${next.id}/`} class="next">
+			<a href={link(`/blog/${next.id}/`)} class="next">
 				<span class="direction">Newer →</span>
 				<span class="title">{next.data.title}</span>
 			</a>
-		) : <a href="/blog" class="next"><span class="direction">Archive →</span><span class="title">All writing</span></a>}
+		) : <a href={link('/blog')} class="next"><span class="direction">Archive →</span><span class="title">All writing</span></a>}
 	</nav>
 
 	<script>

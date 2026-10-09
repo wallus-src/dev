@@ -18,6 +18,7 @@ export function formatDate(date: Date): string {
 		year: 'numeric',
 		month: 'short',
 		day: 'numeric',
+		timeZone: 'UTC',
 	});
 }
 
@@ -29,6 +30,13 @@ export function getAllTags(posts: Post[]): [string, number][] {
 		}
 	}
 	return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+/** Prefix an internal path with the configured base (e.g. '/dev' on GitHub Pages). */
+export function link(path: string): string {
+	return `${base}${path}`;
 }
 
 export function nextPrev(posts: Post[], current: Post): { prev?: Post; next?: Post } {

@@ -1,5 +1,6 @@
 ---
 import { SITE_TITLE } from '../consts';
+import { link } from '../utils/posts';
 ---
 
 <footer class="site-footer">
@@ -7,10 +8,10 @@ import { SITE_TITLE } from '../consts';
 	<div class="shell">
 		<div class="footer-bottom">
 			<nav aria-label="Footer">
-				<a href="/blog">Writing</a>
-				<a href="/tags">Topics</a>
-				<a href="/about">About</a>
-				<a href="/rss.xml">RSS</a>
+				<a href={link('/blog')}>Writing</a>
+				<a href={link('/tags')}>Topics</a>
+				<a href={link('/about')}>About</a>
+				<a href={link('/rss.xml')}>RSS</a>
 			</nav>
 			<span>Set in Fraunces &amp; Inter · Built with Astro</span>
 		</div>

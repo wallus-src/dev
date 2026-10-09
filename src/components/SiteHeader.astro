@@ -1,19 +1,21 @@
 ---
 import { SITE_TITLE } from '../consts';
+import { link } from '../utils/posts';
 import ThemeToggle from './ThemeToggle.astro';
 
-const path = Astro.url.pathname;
-const current = (href: string) =>
-	href === '/' ? path === '/' : path.startsWith(href);
+const base = import.meta.env.BASE_URL;
+const pathname = Astro.url.pathname;
+const rel = pathname.startsWith(base) ? `/${pathname.slice(base.length)}` : pathname;
+const current = (href: string) => (href === '/' ? rel === '/' : rel.startsWith(`${href}/`) || rel === href);
 ---
 
 <header class="site-header">
 	<div class="shell">
-		<a href="/" class="wordmark" aria-label={SITE_TITLE}>{SITE_TITLE}<span class="mark">*</span></a>
+		<a href={link('/')} class="wordmark" aria-label={SITE_TITLE}>{SITE_TITLE}<span class="mark">*</span></a>
 		<nav class="site-nav" aria-label="Site">
-			<a href="/blog" aria-current={current('/blog') ? 'page' : undefined}>Writing</a>
-			<a href="/tags" aria-current={current('/tags') ? 'page' : undefined}>Topics</a>
-			<a href="/about" aria-current={current('/about') ? 'page' : undefined}>About</a>
+			<a href={link('/blog')} aria-current={current('/blog') ? 'page' : undefined}>Writing</a>
+			<a href={link('/tags')} aria-current={current('/tags') ? 'page' : undefined}>Topics</a>
+			<a href={link('/about')} aria-current={current('/about') ? 'page' : undefined}>About</a>
 		</nav>
 		<div class="header-actions">
 			<button class="icon-btn search-trigger" type="button" aria-label="Search" data-open-search>

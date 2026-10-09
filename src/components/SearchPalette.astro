@@ -27,6 +27,7 @@
 	let selected = 0;
 	let results: SearchItem[] = [];
 
+	const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
 	const overlay = () => document.querySelector<HTMLElement>('[data-search-overlay]');
 	const input = () => document.querySelector<HTMLInputElement>('[data-search-input]');
 	const list = () => document.querySelector<HTMLElement>('[data-search-results]');
@@ -34,7 +35,7 @@
 
 	async function loadIndex() {
 		if (index) return;
-		const res = await fetch('/search.json');
+		const res = await fetch(`${BASE}/search.json`);
 		index = (await res.json()) as SearchItem[];
 	}
 
@@ -52,20 +53,30 @@
 	function render() {
 		const el = list();
 		if (!el) return;
+		el.replaceChildren();
 		if (!index || index.length === 0 || (input()?.value.trim() && results.length === 0)) {
-			el.innerHTML = `<div class="search-empty">Nothing found — try another word.</div>`;
+			const empty = document.createElement('div');
+			empty.className = 'search-empty';
+			empty.textContent = 'Nothing found — try another word.';
+			el.append(empty);
 			return;
 		}
 		const items = input()?.value.trim() ? results : index.slice(0, 8);
-		el.innerHTML = items
-			.map(
-				(item, i) => `
-				<a class="search-result ${i === selected ? 'selected' : ''}" href="/blog/${item.slug}/" role="option" data-idx="${i}">
-					<span class="r-title">${item.title}</span>
-					<span class="r-date">${item.date}</span>
-				</a>`
-			)
-			.join('');
+		items.forEach((item, i) => {
+			const a = document.createElement('a');
+			a.className = `search-result ${i === selected ? 'selected' : ''}`;
+			a.href = `${BASE}/blog/${encodeURIComponent(item.slug)}/`;
+			a.setAttribute('role', 'option');
+			a.dataset.idx = String(i);
+			const title = document.createElement('span');
+			title.className = 'r-title';
+			title.textContent = item.title;
+			const date = document.createElement('span');
+			date.className = 'r-date';
+			date.textContent = item.date;
+			a.append(title, date);
+			el.append(a);
+		});
 	}
 
 	function run() {
@@ -83,7 +94,7 @@
 		overlay()?.classList.add('open');
 		document.body.style.overflow = 'hidden';
 		loadIndex().then(() => {
-			render();
+			run();
 			input()?.focus();
 		});
 	}
